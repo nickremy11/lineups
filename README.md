@@ -31,6 +31,6 @@ Edits are saved per team in the browser (localStorage); "Reset to default" clear
 ## Dev / deploy
 ```
 npm install
-npm run dev        # http://localhost:8787/nhl/
-npm run deploy     # needs bruisedbanana.dev on your Cloudflare account (custom domain in wrangler.jsonc)
+npm run dev        # cf dev — local server, see terminal for the URL
+npm run deploy     # needs bruisedbanana.dev on your Cloudflare account (custom domain in cloudflare.config.ts)
 ```
