@@ -39,9 +39,15 @@ body[data-tiles="dark"]   { --t-bg: #17212b; --t-bd: #2c3b49; --t-tx: #f2f7fb; -
     linear-gradient(90deg, transparent calc(33% - 1px), #ffffff26 calc(33% - 1px) 33%, transparent 33% calc(67% - 1px), #ffffff26 calc(67% - 1px) 67%, transparent 67%),
     repeating-linear-gradient(0deg, #3a8f4a 0 80px, #348643 80px 160px);
   box-shadow: 0 3px 14px #1f5a2a44; }
-.field::before { content: attr(data-title); position: absolute; top: 6px; left: 14px; font: 800 12px/1 -apple-system, sans-serif; letter-spacing: .24em; color: #ffffffd9; text-shadow: 0 1px 2px #0a3a1a99; }
-.field::after { content: attr(data-note); position: absolute; top: 6px; right: 14px; font: 600 11px/1 -apple-system, sans-serif; color: #ffffffc0; text-shadow: 0 1px 2px #0a3a1a99; }
+.field[data-title]::before { content: attr(data-title); position: absolute; top: 6px; left: 14px; font: 800 12px/1 -apple-system, sans-serif; letter-spacing: .24em; color: #ffffffd9; text-shadow: 0 1px 2px #0a3a1a99; }
 .field.st { padding-top: 34px; }
+.field.main { padding-top: 12px; }
+.half-label { display: flex; justify-content: space-between; align-items: baseline; margin: 0 2px 8px; color: #ffffffd9; text-shadow: 0 1px 2px #0a3a1a99; }
+.half-label b { font: 800 12px/1 -apple-system, sans-serif; letter-spacing: .24em; }
+.half-label span { font: 600 11px/1 -apple-system, sans-serif; color: #ffffffc0; }
+.los { position: relative; height: 5px; margin: 14px -14px 16px; background: #2f6fe0; box-shadow: 0 0 0 1px #ffffff99, 0 2px 8px #0a2a6a66; z-index: 0; }
+.los span { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: #2f6fe0; color: #fff; font: 800 10px/1 -apple-system, sans-serif; letter-spacing: .22em; padding: 4px 12px; border-radius: 99px; border: 1px solid #ffffffcc; }
+.grid9.def .spot { grid-row-start: var(--r); }
 .grid9 { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); column-gap: 8px; row-gap: 14px; align-items: start; }
 .grid7 { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); column-gap: 8px; align-items: start; }
 .spot { min-width: 0; grid-column: var(--c); grid-row: var(--r); }

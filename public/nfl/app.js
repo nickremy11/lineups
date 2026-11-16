@@ -11,12 +11,13 @@ const state = {
 
 // ---------- formation layout: label -> [column 1-9, row] ----------
 const OFF_MAP = { LWR: [1, 1], LT: [2, 1], LG: [3, 1], C: [4, 1], RG: [5, 1], RT: [6, 1], TE: [7, 1], SWR: [8, 1], RWR: [9, 1], QB: [4, 2], FB: [3, 2], RB: [5, 2] };
-const DB_MAP = { LCB: [1, 3], SS: [3, 3], NB: [5, 3], FS: [7, 3], RCB: [9, 3] };
+// defense sits above the line of scrimmage: secondary at the top, linemen right at the line
+const DB_MAP = { LCB: [1, 1], SS: [3, 1], NB: [5, 1], FS: [7, 1], RCB: [9, 1] };
 function defMap(labels) {
   const four = labels.includes("LDE");
   const dl = four
-    ? { LDE: [2, 1], LDT: [4, 1], NT: [4, 1], RDT: [6, 1], DT: [6, 1], RDE: [8, 1] }
-    : { DE: [3, 1], NT: [5, 1], DT: [7, 1] };
+    ? { LDE: [2, 3], LDT: [4, 3], NT: [4, 3], RDT: [6, 3], DT: [6, 3], RDE: [8, 3] }
+    : { DE: [3, 3], NT: [5, 3], DT: [7, 3] };
   const lb = labels.includes("LOLB")
     ? { LOLB: [2, 2], WLB: [4, 2], MLB: [6, 2], ROLB: [8, 2] }
     : { WLB: [3, 2], MLB: [5, 2], SLB: [7, 2] };
@@ -29,7 +30,7 @@ function layout(unit, labels) {
     if (unit === "st") return { label, c: i + 1, r: 1 };
     const p = map[label];
     if (p) return { label, c: p[0], r: p[1] };
-    return { label, c: extraCol++, r: 4 }; // unknown slot: park below the formation
+    return { label, c: extraCol++, r: unit === "def" ? 0 : 4 }; // unknown slot: park at the far edge of the formation
   });
 }
 
@@ -85,10 +86,15 @@ function spotHtml(unit, { label, c, r }) {
 // ---------- render ----------
 function render() {
   const src = state.payload.source, m = state.payload.meta;
-  const sec = (unit, title, note, grid) =>
-    `<div class="field${unit === "st" ? " st" : ""}" data-title="${title}" data-note="${esc(note || "")}"><div class="${grid}">${layout(unit, state.labels[unit]).map((s) => spotHtml(unit, s)).join("")}</div></div>`;
+  const grid = (unit, cls) => `<div class="${cls}">${layout(unit, state.labels[unit]).map((s) => spotHtml(unit, s)).join("")}</div>`;
+  const half = (title, note) => `<div class="half-label"><b>${title}</b><span>${esc(note || "")}</span></div>`;
   $("#board").innerHTML = `<div class="source">Default depth chart: <a href="${esc(src.url)}" target="_blank" rel="noopener">${esc(src.name)}</a> · headshots &amp; injuries from ESPN · drag tiles to reorder, move, or bench players.</div>
-    ${sec("off", "OFFENSE", m.offense, "grid9")}${sec("def", "DEFENSE", m.defense, "grid9")}${sec("st", "SPECIAL TEAMS", "", "grid7")}`;
+    <div class="field main">
+      ${half("DEFENSE", m.defense)}${grid("def", "grid9 def")}
+      <div class="los"><span>LINE OF SCRIMMAGE</span></div>
+      ${half("OFFENSE", m.offense)}${grid("off", "grid9 off")}
+    </div>
+    <div class="field st" data-title="SPECIAL TEAMS">${grid("st", "grid7")}</div>`;
   renderBench();
   const n = countChanges();
   $("#changes").textContent = n ? `${n} slot${n > 1 ? "s" : ""} changed` : "";
@@ -172,13 +178,12 @@ $("#copyBtn").addEventListener("click", () => {
 
 // ---------- tile style ----------
 function setTiles(t) {
-  if (!["light", "medium", "dark"].includes(t)) t = "medium";
+  if (!["light", "medium", "dark"].includes(t)) t = "light";
   document.body.dataset.tiles = t;
-  store.set("lineups:nfl:tiles", t);
   document.querySelectorAll("#tileSeg button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.tiles === t));
 }
-document.querySelectorAll("#tileSeg button").forEach((b) => b.addEventListener("click", () => setTiles(b.dataset.tiles)));
-setTiles(new URLSearchParams(location.search).get("tiles") || store.get("lineups:nfl:tiles") || "medium");
+document.querySelectorAll("#tileSeg button").forEach((b) => b.addEventListener("click", () => { setTiles(b.dataset.tiles); store.set("lineups:nfl:tile-style", b.dataset.tiles); }));
+setTiles(new URLSearchParams(location.search).get("tiles") || store.get("lineups:nfl:tile-style") || "light");
 
 // ---------- persistence ----------
 const key = () => `lineups:nfl:${state.abbrev}`;
