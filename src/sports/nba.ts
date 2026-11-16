@@ -144,7 +144,7 @@ export const listNbaTeams = () =>
 
 export async function searchNbaPlayers(q: string) {
   const r = await getJson<any>(
-    `https://site.web.api.espn.com/apis/common/v3/search?query=${encodeURIComponent(q)}&limit=12&type=player&sport=basketball&league=nba`, 300);
+    `https://site.api.espn.com/apis/common/v3/search?query=${encodeURIComponent(q)}&limit=12&type=player&sport=basketball&league=nba`, 300);
   return (r.items ?? []).map((i: any) => ({
     id: String(i.id), name: i.displayName, pos: i.position?.abbreviation ?? "", number: i.jersey ?? null, team: i.teamRelationships?.[0]?.core?.abbreviation ?? null,
   }));
@@ -154,7 +154,7 @@ export async function getNbaPlayer(id: string): Promise<NbaPlayer | null> {
   if (!/^\d+$/.test(id)) return null;
   const [a, o] = await Promise.all([
     getJson<any>(`https://site.api.espn.com/apis/common/v3/sports/basketball/nba/athletes/${id}`, 900).catch(() => null),
-    getJson<any>(`https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba/athletes/${id}/overview`, 900).catch(() => null),
+    getJson<any>(`https://site.api.espn.com/apis/common/v3/sports/basketball/nba/athletes/${id}/overview`, 900).catch(() => null),
   ]);
   const ath = a?.athlete;
   if (!ath) return null;
