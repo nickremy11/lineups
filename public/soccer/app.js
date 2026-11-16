@@ -1,5 +1,5 @@
 // Soccer lineup editor: pitch + formation + backups under each slot. Talks to /api/soccer/*.
-import { $, esc, clone, store, toast, initAddModal } from "/shared/ui.js";
+import { $, esc, clone, store, toast, initAddModal, initScreenshot } from "/shared/ui.js";
 import { initDnd } from "/shared/dnd.js";
 
 const FORMATIONS = ["4-3-3", "4-2-3-1", "4-4-2", "4-1-4-1", "4-3-2-1", "4-4-1-1", "4-1-2-1-2", "3-5-2", "3-4-3", "3-4-2-1", "5-3-2", "5-4-1"];
@@ -428,3 +428,13 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") { addModal
   state.leagueId = league;
   loadTeam(team, league);
 })();
+
+// ---------- screenshot ----------
+initScreenshot({
+  getTarget: () => (state.payload ? $("#board") : null),
+  getTitle: () => ({
+    title: state.payload.team.name,
+    sub: $("#changes").textContent ? `Edited lineup · ${$("#changes").textContent}` : "Default lineup",
+  }),
+  filename: () => `${state.payload.team.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-lineup`,
+});

@@ -60,6 +60,11 @@ ESPN for the 365-team list (grouped by conference), rosters (class year) and sea
 (PG/SG/SF/PF/C order) for the ~94 high-major teams it covers. Other teams get an estimated depth chart (top-5 by minutes seated by
 ESPN G/F/C position) and a banner says so. RealGM is behind a Cloudflare challenge; thedepthchartcbb.com is a paid JS app.
 
+## Screenshot / copy image
+Every sport page has a **Screenshot** menu (copy to clipboard or download PNG) built on a vendored copy of `modern-screenshot`
+(`public/shared/vendor/`). It captures the board with a title strip; NHL leaves out PP/PK and NFL leaves out special teams.
+Headshots are routed through `/api/img` (allowlisted hosts only) so the browser can read them without CORS taint.
+
 ## Dev / deploy
 ```
 npm install

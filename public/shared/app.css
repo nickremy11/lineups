@@ -62,3 +62,13 @@
 .toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: var(--panel-2); border: 1px solid var(--line); padding: 9px 14px; border-radius: 10px; z-index: 90; box-shadow: 0 10px 30px #000a; }
 .loading { color: var(--muted); padding: 40px; text-align: center; }
 .over { border-color: var(--accent) !important; background: #4aa3ff14; }
+
+/* screenshot menu + caption */
+.shot-menu { position: fixed; z-index: 70; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 4px; box-shadow: 0 12px 34px #0006; min-width: 210px; }
+.shot-menu[hidden] { display: none; }
+.shot-menu button { display: block; width: 100%; text-align: left; background: none; border: 0; border-radius: 7px; padding: 8px 10px; color: var(--text); }
+.shot-menu button:hover { background: var(--panel-2); }
+.shot-cap { display: flex; align-items: baseline; gap: 10px; padding: 2px 4px 10px; color: var(--text); font-size: 14px; }
+.shot-cap b { font-size: 17px; }
+.shot-cap span { color: var(--muted); font-size: 12px; flex: 1; }
+.shot-cap i { font-style: normal; color: var(--muted); font-size: 11px; letter-spacing: .02em; }

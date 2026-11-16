@@ -1,5 +1,5 @@
 // NHL depth chart editor. No build step; talks to /api/nhl/*.
-import { $, esc, clone, store, toast, initTeamPicker, initAddModal } from "/shared/ui.js";
+import { $, esc, clone, store, toast, initTeamPicker, initAddModal, initScreenshot } from "/shared/ui.js";
 import { initDnd } from "/shared/dnd.js";
 
 const state = {
@@ -290,3 +290,14 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") { addModal
   });
   loadTeam(state.teams.some((t) => t.abbrev === want) ? want : "BOS");
 })();
+
+// ---------- screenshot ----------
+initScreenshot({
+  exclude: ".sec.compact", // image = lines, D pairings, goalies (no PP/PK)
+  getTarget: () => (state.payload ? $("#board") : null),
+  getTitle: () => ({
+    title: state.payload.team.name,
+    sub: $("#changes").textContent ? `Edited lineup · ${$("#changes").textContent}` : "Default lineup",
+  }),
+  filename: () => `${state.payload.team.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-lineup`,
+});

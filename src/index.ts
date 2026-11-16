@@ -15,6 +15,18 @@ const json = (data: unknown, status = 200, maxAge = 60) =>
     },
   });
 
+// Same-origin image proxy (allowlisted hosts only) so the screenshot feature can read headshots without CORS taint.
+const IMG_HOSTS = new Set(["assets.nhle.com", "a.espncdn.com", "images.fotmob.com"]);
+async function proxyImage(url: URL): Promise<Response> {
+  let target: URL;
+  try { target = new URL(url.searchParams.get("u") ?? ""); } catch { return json({ error: "bad url" }, 400, 0); }
+  if (target.protocol !== "https:" || !IMG_HOSTS.has(target.hostname)) return json({ error: "host not allowed" }, 403, 0);
+  const up = await fetch(target.toString(), { headers: { "user-agent": "Mozilla/5.0 (compatible; lineups-app)" }, cf: { cacheTtl: 86400, cacheEverything: true } });
+  const type = up.headers.get("content-type") ?? "";
+  if (!up.ok || !type.startsWith("image/")) return json({ error: `upstream ${up.status}` }, 502, 0);
+  return new Response(up.body, { headers: { "content-type": type, "cache-control": "public, max-age=86400" } });
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
@@ -22,6 +34,7 @@ export default {
     if (parts[0] !== "api") return env.ASSETS.fetch(request);
 
     try {
+      if (parts[1] === "img") return await proxyImage(url);
       if (parts[1] === "nhl") {
         if (parts[2] === "teams" && !parts[3]) return json(listTeams(), 200, 3600);
         if (parts[2] === "teams" && parts[3]) {

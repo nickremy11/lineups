@@ -1,5 +1,5 @@
 // NCAAB depth chart editor: half-court by position (no photos). Talks to /api/ncaab/*.
-import { $, esc, clone, store, toast, initTeamPicker, initAddModal } from "/shared/ui.js";
+import { $, esc, clone, store, toast, initTeamPicker, initAddModal, initScreenshot } from "/shared/ui.js";
 import { initDnd } from "/shared/dnd.js";
 
 const POS = ["PG", "SG", "SF", "PF", "C"];
@@ -257,3 +257,13 @@ let picker;
   });
   loadTeam(state.teams.some((t) => t.id === want) ? want : "150");
 })();
+
+// ---------- screenshot ----------
+initScreenshot({
+  getTarget: () => (state.payload ? $("#board") : null),
+  getTitle: () => ({
+    title: state.payload.team.name,
+    sub: $("#changes").textContent ? `Edited lineup · ${$("#changes").textContent}` : "Default lineup",
+  }),
+  filename: () => `${state.payload.team.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-lineup`,
+});

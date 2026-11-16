@@ -1,5 +1,5 @@
 // NFL depth chart editor: offense and defense on a football field. Talks to /api/nfl/*.
-import { $, esc, clone, store, toast, initTeamPicker, initAddModal } from "/shared/ui.js";
+import { $, esc, clone, store, toast, initTeamPicker, initAddModal, initScreenshot } from "/shared/ui.js";
 import { initDnd } from "/shared/dnd.js";
 
 const UNITS = ["off", "def", "st"];
@@ -281,3 +281,14 @@ let picker;
   });
   loadTeam(state.teams.some((t) => t.abbrev === want) ? want : "BUF");
 })();
+
+// ---------- screenshot ----------
+initScreenshot({
+  exclude: ".field.st", // image = offense + defense (no special teams)
+  getTarget: () => (state.payload ? $("#board") : null),
+  getTitle: () => ({
+    title: state.payload.team.name,
+    sub: $("#changes").textContent ? `Edited lineup · ${$("#changes").textContent}` : "Default lineup",
+  }),
+  filename: () => `${state.payload.team.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-lineup`,
+});

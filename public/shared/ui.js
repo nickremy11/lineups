@@ -90,3 +90,94 @@ export function initAddModal({ searchUrl, playerUrl, onAdd, onCustom }) {
   });
   return { close };
 }
+
+/**
+ * Screenshot button: copy the lineup board as a PNG to the clipboard, or download it.
+ * getTarget(): element to capture; getTitle(): { title, sub }; filename(): base file name;
+ * exclude: optional CSS selector for parts of the board to leave out of the image (e.g. special teams).
+ */
+export function initScreenshot({ getTarget, getTitle, filename, exclude }) {
+  const btn = $("#shotBtn");
+  if (!btn) return;
+  const menu = document.createElement("div");
+  menu.className = "shot-menu";
+  menu.hidden = true;
+  menu.innerHTML = `<button data-act="copy">Copy image to clipboard</button><button data-act="save">Download PNG</button>`;
+  document.body.appendChild(menu);
+
+  const place = () => {
+    const r = btn.getBoundingClientRect();
+    menu.style.top = `${r.bottom + 6}px`;
+    menu.style.left = `${Math.max(8, Math.min(r.left, innerWidth - 230))}px`;
+  };
+  btn.addEventListener("click", (e) => { e.stopPropagation(); place(); menu.hidden = !menu.hidden; });
+  document.addEventListener("click", (e) => { if (!menu.contains(e.target)) menu.hidden = true; });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") menu.hidden = true; });
+
+  async function capture() {
+    const el = getTarget();
+    if (!el) throw new Error("Nothing to capture yet");
+    const { domToBlob } = await import("/shared/vendor/modern-screenshot.mjs");
+    // route cross-origin images through our same-origin proxy so the canvas isn't tainted
+    const swapped = [];
+    for (const img of el.querySelectorAll("img")) {
+      if (!/^https?:/.test(img.src) || new URL(img.src).origin === location.origin) continue;
+      swapped.push([img, img.getAttribute("src")]);
+      img.loading = "eager";
+      img.src = `/api/img?u=${encodeURIComponent(img.src)}`;
+    }
+    await Promise.all(swapped.map(([img]) => img.decode().catch(() => {})));
+    // title strip on top of the captured area
+    const { title, sub } = getTitle();
+    const cap = document.createElement("div");
+    cap.className = "shot-cap";
+    cap.innerHTML = `<b>${esc(title)}</b><span>${esc(sub)}</span><i>lineups.bruisedbanana.dev</i>`;
+    el.prepend(cap);
+    try {
+      const bg = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() || "#ffffff";
+      return await domToBlob(el, {
+        scale: 1.5, backgroundColor: bg, type: "image/png", font: false,
+        filter: exclude ? (node) => !(node.nodeType === 1 && node.matches(exclude)) : undefined,
+      });
+    } finally {
+      cap.remove();
+      for (const [img, src] of swapped) img.setAttribute("src", src);
+    }
+  }
+
+  menu.addEventListener("click", async (e) => {
+    const act = e.target.closest("[data-act]")?.dataset.act;
+    if (!act) return;
+    menu.hidden = true;
+    const label = btn.textContent;
+    btn.disabled = true; btn.textContent = "Capturing…";
+    try {
+      const blobPromise = capture();
+      const download = async () => {
+        const blob = await blobPromise;
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `${filename()}.png`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      };
+      if (act === "copy") {
+        try {
+          // pass the promise so Safari keeps the user gesture; Chrome/Firefox accept it too
+          await navigator.clipboard.write([new ClipboardItem({ "image/png": blobPromise })]);
+          toast("Lineup image copied to clipboard.");
+        } catch {
+          await download();
+          toast("Couldn't write to the clipboard here — downloaded the image instead.");
+        }
+      } else {
+        await download();
+        toast("Image downloaded.");
+      }
+    } catch (err) {
+      toast(`Couldn't capture the lineup (${err.message || err}).`);
+    } finally {
+      btn.disabled = false; btn.textContent = label;
+    }
+  });
+}
