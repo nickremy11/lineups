@@ -11,10 +11,12 @@ public/                 static assets (served by Workers Assets)
   shared/app.css        tile / bench / modal styles shared by all sports
   nhl/                  NHL page (index.html, app.js, nhl.css)   -> /nhl/
   nba/                  NBA half-court page                      -> /nba/
+  nfl/                  NFL football-field page                  -> /nfl/
 src/
   index.ts              router: /api/<sport>/... ; everything else -> assets
   sports/nhl.ts         NHL data adapter (NHL API + DailyFaceoff + PuckPedia)
   sports/nba.ts         NBA data adapter (ESPN depth chart, roster, season averages)
+  sports/nfl.ts         NFL data adapter (Ourlads depth chart + ESPN roster)
   sports/nhl-teams.ts   team list (abbrev, DailyFaceoff slug, division)
   sports/types.ts       shared Player / Lineup types
 ```
@@ -37,6 +39,11 @@ ESPN only: depth chart page (`__espnfitt__` JSON: rows PG/SG/SF/PF/C, starter th
 team stats page (MPG/PPG/RPG/APG/FG%/3P%), search + player endpoints for "Add player". Players listed at several positions get a primary
 position (where they rank highest) plus secondary chips. Defaults are capped at starter + 3 backups per position.
 RealGM is behind a Cloudflare challenge, so it isn't used.
+
+## NFL data sources
+Ourlads depth chart page (server-rendered HTML tables: offense, defense, special teams, practice squad, reserves; formation varies by
+team, e.g. 3-4 vs 4-3) for the lines; ESPN roster API for headshots, injuries and practice-squad/IR flags (matched by name, then jersey).
+Tiles can be switched between light / medium / dark in the header.
 
 ## Dev / deploy
 ```
