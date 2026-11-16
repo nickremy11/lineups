@@ -56,3 +56,17 @@ body { background: linear-gradient(180deg, #f3f9fe, #dce8f3) fixed; }
 .popover input, .modal input, .modal select { background: #fff; }
 .team-grid button:hover { background: #e3edf7; }
 .results button { background: #fff; }
+
+/* ---- mid-tone slate tiles (headshots keep a light circle) ---- */
+.tile { background: #6a87aa; border-color: #4f6d90; color: #fff; box-shadow: 0 2px 6px #14304f33; }
+.tile:hover { border-color: #12263c; }
+.tile .name { color: #fff; }
+.tile .num { color: #e3eef9; }
+.tile .face { background: #dbe8f4; color: #587089; box-shadow: 0 0 0 2px #ffffff55; }
+.chip { background: #12263c; color: #fff; }
+.chip.alt { background: transparent; border: 1px solid #d3e3f3; color: #eef5fc; }
+.chip.hand { background: #ffffff30; color: #fff; }
+.stats { color: #dbe8f4; }
+.stats b { color: #fff; }
+.tile.changed { box-shadow: inset 3px 0 0 #12263c, 0 2px 6px #14304f33; }
+.slot { border-color: #9db8d2; }
