@@ -1,13 +1,6 @@
 // NHL depth chart editor. No build step; talks to /api/nhl/*.
-
-const $ = (s, r = document) => r.querySelector(s);
-const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const clone = (o) => JSON.parse(JSON.stringify(o));
-const store = {
-  get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
-  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* private mode */ } },
-  del(k) { try { localStorage.removeItem(k); } catch { /* ignore */ } },
-};
+import { $, esc, clone, store, toast, initTeamPicker, initAddModal } from "/shared/ui.js";
+import { initDnd } from "/shared/dnd.js";
 
 const state = {
   teams: [], abbrev: null, payload: null,
@@ -160,71 +153,16 @@ function applyMove(from, to, pid) {
   setSlot(L, to, pid);
 }
 
-// ---------- drag & drop (pointer events: mouse + touch) ----------
-let drag = null;
-const board = document.body;
-board.addEventListener("pointerdown", (e) => {
-  const tile = e.target.closest(".tile[data-pid]");
-  if (!tile || tile.classList.contains("ghost") || e.target.closest("[data-action]")) return;
-  if (e.pointerType === "mouse" && e.button !== 0) return;
-  drag = { tile, pid: tile.dataset.pid, from: tile.dataset.slot || null, x: e.clientX, y: e.clientY, active: false, touch: e.pointerType !== "mouse", timer: null, ghost: null, over: null };
-  if (drag.touch) drag.timer = setTimeout(() => beginDrag(e.clientX, e.clientY), 220);
-});
-window.addEventListener("pointermove", (e) => {
-  if (!drag) return;
-  const moved = Math.hypot(e.clientX - drag.x, e.clientY - drag.y);
-  if (!drag.active) {
-    if (drag.touch) { if (moved > 8) cancelDrag(); return; } // let the page scroll
-    if (moved < 4) return;
-    beginDrag(e.clientX, e.clientY);
-  }
-  drag.ghost.style.left = `${e.clientX - drag.dx}px`;
-  drag.ghost.style.top = `${e.clientY - drag.dy}px`;
-  const t = document.elementFromPoint(e.clientX, e.clientY)?.closest(".slot, .bench");
-  if (t !== drag.over) { drag.over?.classList.remove("over"); t?.classList.add("over"); drag.over = t; }
-  if (e.clientY < 70) window.scrollBy(0, -14); else if (e.clientY > innerHeight - 70) window.scrollBy(0, 14);
-});
-window.addEventListener("pointerup", () => {
-  if (!drag) return;
-  clearTimeout(drag.timer);
-  if (drag.active) {
-    const t = drag.over;
-    drag.ghost.remove();
-    if (t) {
-      const to = t.classList.contains("bench") ? "bench" : t.dataset.slot;
-      applyMove(drag.from, to, drag.pid);
-      persist();
-    }
-    drag = null;
+// ---------- drag & drop ----------
+const dnd = initDnd({
+  dropSelector: ".slot, .bench",
+  onDrop(src, target) {
+    const to = target.classList.contains("bench") ? "bench" : target.dataset.slot;
+    applyMove(src.from || null, to, src.pid);
+    persist();
     render();
-  } else drag = null;
+  },
 });
-window.addEventListener("pointercancel", () => cancelDrag());
-document.addEventListener("touchmove", (e) => { if (drag?.active) e.preventDefault(); }, { passive: false });
-document.addEventListener("selectstart", (e) => { if (drag) e.preventDefault(); });
-
-function beginDrag(x, y) {
-  if (!drag || drag.active) return;
-  drag.active = true;
-  const r = drag.tile.getBoundingClientRect();
-  drag.dx = x - r.left; drag.dy = y - r.top;
-  const g = drag.tile.cloneNode(true);
-  g.classList.add("ghost");
-  g.style.width = `${r.width}px`;
-  g.style.left = `${r.left}px`; g.style.top = `${r.top}px`;
-  document.body.appendChild(g);
-  drag.ghost = g;
-  drag.tile.classList.add("dragging");
-  if (navigator.vibrate) navigator.vibrate(8);
-}
-function cancelDrag() {
-  if (!drag) return;
-  clearTimeout(drag.timer);
-  drag.ghost?.remove();
-  drag.tile.classList.remove("dragging");
-  drag.over?.classList.remove("over");
-  drag = null;
-}
 
 $("#bench").addEventListener("click", (e) => {
   if (e.target.closest("[data-action=remove]")) {
@@ -290,32 +228,8 @@ async function loadTeam(abbrev) {
 }
 
 // ---------- team picker ----------
-function renderTeamList(filter = "") {
-  const f = filter.trim().toLowerCase();
-  const divs = {};
-  for (const t of state.teams) {
-    if (f && !t.name.toLowerCase().includes(f) && !t.abbrev.toLowerCase().includes(f)) continue;
-    (divs[`${t.conference} · ${t.division}`] ??= []).push(t);
-  }
-  $("#teamList").innerHTML = Object.keys(divs).sort().map((d) => `<h4>${esc(d)}</h4><div class="team-grid">${divs[d].map((t) =>
-    `<button data-team="${t.abbrev}" class="${t.abbrev === state.abbrev ? "on" : ""}"><img src="${esc(t.logo)}" alt="" loading="lazy">${esc(t.name)}</button>`).join("")}</div>`).join("");
-}
-const markTeamPicker = () => renderTeamList($("#teamSearch").value);
-$("#teamBtn").addEventListener("click", () => {
-  const pop = $("#teamPop");
-  pop.hidden = !pop.hidden;
-  if (!pop.hidden) $("#teamSearch").focus();
-});
-$("#teamSearch").addEventListener("input", (e) => renderTeamList(e.target.value));
-$("#teamList").addEventListener("click", (e) => {
-  const b = e.target.closest("[data-team]");
-  if (!b) return;
-  $("#teamPop").hidden = true;
-  loadTeam(b.dataset.team);
-});
-document.addEventListener("click", (e) => {
-  if (!e.target.closest("#teamPop, #teamBtn")) $("#teamPop").hidden = true;
-});
+let picker;
+const markTeamPicker = () => picker?.render();
 
 // ---------- reset ----------
 $("#resetBtn").addEventListener("click", () => {
@@ -325,16 +239,27 @@ $("#resetBtn").addEventListener("click", () => {
 });
 
 // ---------- add player ----------
-const modal = $("#modal");
-$("#addBtn").addEventListener("click", () => { modal.hidden = false; $("#playerSearch").focus(); });
-$("#modalClose").addEventListener("click", () => (modal.hidden = true));
-modal.addEventListener("click", (e) => { if (e.target === modal) modal.hidden = true; });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") { modal.hidden = true; $("#teamPop").hidden = true; cancelDrag(); } });
-modal.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => {
-  modal.querySelectorAll(".tab").forEach((x) => x.classList.toggle("on", x === t));
-  $("#tabSearch").hidden = t.dataset.tab !== "search";
-  $("#tabCustom").hidden = t.dataset.tab !== "custom";
-}));
+const addModal = initAddModal({
+  searchUrl: "/api/nhl/search",
+  playerUrl: "/api/nhl/player",
+  onAdd: (p) => addPlayer(p),
+  onCustom(f) {
+    const pos = f.pos;
+    const alt = (f.alt || "").toUpperCase().split(/[\s,\/|]+/).filter((x) => ["C", "LW", "RW", "LD", "RD", "G"].includes(x) && x !== pos);
+    const p = {
+      id: `c-${Date.now()}`, name: f.name.trim(), number: f.number === "" ? null : +f.number,
+      pos, alt, shoots: pos === "LD" ? "L" : pos === "RD" ? "R" : f.shoots, custom: true,
+    };
+    const num = (v) => (v === "" || v == null ? 0 : +v);
+    if (pos === "G") p.goalie = { gp: 0, w: 0, gaa: null, svp: null };
+    else {
+      let toi = null;
+      if (f.toi) { const [m, s] = f.toi.split(":").map(Number); toi = m * 60 + (s || 0); }
+      p.skater = { gp: 0, toi, g: num(f.g), a: num(f.a), pm: f.pm === "" ? null : +f.pm };
+    }
+    addPlayer(p);
+  },
+});
 
 function addPlayer(p) {
   if (state.players.has(p.id)) { toast(`${p.name} is already on this roster.`); return; }
@@ -343,62 +268,11 @@ function addPlayer(p) {
   state.added.push(p);
   persist();
   render();
-  modal.hidden = true;
+  addModal.close();
   toast(`${p.name} added to the bench — drag them into the lineup.`);
 }
 
-let searchTimer;
-$("#playerSearch").addEventListener("input", (e) => {
-  clearTimeout(searchTimer);
-  const q = e.target.value.trim();
-  if (q.length < 2) { $("#searchResults").innerHTML = ""; return; }
-  searchTimer = setTimeout(async () => {
-    try {
-      const rs = await (await fetch(`/api/nhl/search?q=${encodeURIComponent(q)}`)).json();
-      $("#searchResults").innerHTML = rs.length
-        ? rs.map((r) => `<button data-id="${esc(r.id)}"><span>${esc(r.name)} <small>${esc(r.pos)}${r.number != null ? " #" + r.number : ""}</small></span><small>${esc(r.team || "—")}</small></button>`).join("")
-        : `<small>No active players found.</small>`;
-    } catch { $("#searchResults").innerHTML = `<small>Search failed.</small>`; }
-  }, 250);
-});
-$("#searchResults").addEventListener("click", async (e) => {
-  const b = e.target.closest("[data-id]");
-  if (!b) return;
-  b.disabled = true;
-  try {
-    const res = await fetch(`/api/nhl/player/${b.dataset.id}`);
-    if (!res.ok) throw new Error("not found");
-    addPlayer(await res.json());
-  } catch { toast("Couldn't load that player."); b.disabled = false; }
-});
-$("#tabCustom").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const f = Object.fromEntries(new FormData(e.target));
-  const pos = f.pos;
-  const alt = (f.alt || "").toUpperCase().split(/[\s,\/|]+/).filter((x) => ["C", "LW", "RW", "LD", "RD", "G"].includes(x) && x !== pos);
-  const p = {
-    id: `c-${Date.now()}`, name: f.name.trim(), number: f.number === "" ? null : +f.number,
-    pos, alt, shoots: pos === "LD" ? "L" : pos === "RD" ? "R" : f.shoots, custom: true,
-  };
-  const num = (v) => (v === "" || v == null ? 0 : +v);
-  if (pos === "G") p.goalie = { gp: 0, w: 0, gaa: null, svp: null };
-  else {
-    let toi = null;
-    if (f.toi) { const [m, s] = f.toi.split(":").map(Number); toi = m * 60 + (s || 0); }
-    p.skater = { gp: 0, toi, g: num(f.g), a: num(f.a), pm: f.pm === "" ? null : +f.pm };
-  }
-  addPlayer(p);
-  e.target.reset();
-});
-
-// ---------- toast ----------
-let toastTimer;
-function toast(msg) {
-  const t = $("#toast");
-  t.textContent = msg; t.hidden = false;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => (t.hidden = true), 3500);
-}
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") { addModal.close(); $("#teamPop").hidden = true; } });
 
 // ---------- boot ----------
 (async function init() {
@@ -409,6 +283,10 @@ function toast(msg) {
     return;
   }
   const want = new URLSearchParams(location.search).get("team")?.toUpperCase() || store.get("lineups:nhl:last") || "BOS";
-  renderTeamList();
+  picker = initTeamPicker({
+    teams: state.teams.map((t) => ({ ...t, group: `${t.conference} · ${t.division}` })),
+    getCurrent: () => state.abbrev,
+    onPick: (ab) => loadTeam(ab),
+  });
   loadTeam(state.teams.some((t) => t.abbrev === want) ? want : "BOS");
 })();

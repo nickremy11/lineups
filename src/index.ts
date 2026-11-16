@@ -1,3 +1,4 @@
+import { getNbaPlayer, getNbaTeam, listNbaTeams, searchNbaPlayers } from "./sports/nba";
 import { getPlayer, getTeam, listTeams, searchPlayers } from "./sports/nhl";
 
 interface Env { ASSETS: Fetcher }
@@ -30,6 +31,21 @@ export default {
         }
         if (parts[2] === "player" && parts[3]) {
           const p = await getPlayer(parts[3]);
+          return p ? json(p, 200, 300) : json({ error: "Player not found" }, 404);
+        }
+      }
+      if (parts[1] === "nba") {
+        if (parts[2] === "teams" && !parts[3]) return json(listNbaTeams(), 200, 3600);
+        if (parts[2] === "teams" && parts[3]) {
+          const team = await getNbaTeam(parts[3]);
+          return team ? json(team, 200, 120) : json({ error: "Unknown team" }, 404);
+        }
+        if (parts[2] === "search") {
+          const q = url.searchParams.get("q")?.trim() ?? "";
+          return q.length < 2 ? json([]) : json(await searchNbaPlayers(q), 200, 300);
+        }
+        if (parts[2] === "player" && parts[3]) {
+          const p = await getNbaPlayer(parts[3]);
           return p ? json(p, 200, 300) : json({ error: "Player not found" }, 404);
         }
       }
