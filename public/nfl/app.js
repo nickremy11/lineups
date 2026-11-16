@@ -12,7 +12,7 @@ const state = {
 // ---------- formation layout: label -> [column 1-9, row] ----------
 const OFF_MAP = { LWR: [1, 1], LT: [2, 1], LG: [3, 1], C: [4, 1], RG: [5, 1], RT: [6, 1], TE: [7, 1], SWR: [8, 1], RWR: [9, 1], QB: [4, 2], FB: [3, 2], RB: [5, 2] };
 // defense sits above the line of scrimmage: secondary at the top, linemen right at the line
-const DB_MAP = { LCB: [1, 1], SS: [3, 1], NB: [5, 1], FS: [7, 1], RCB: [9, 1] };
+const DB_MAP = { LCB: [1, 1], SS: [3, 1], NB: [8, 1], FS: [7, 1], RCB: [9, 1] };
 function defMap(labels) {
   const four = labels.includes("LDE");
   const dl = four
