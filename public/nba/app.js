@@ -7,6 +7,7 @@ const state = {
   teams: [], abbrev: null, payload: null,
   players: new Map(), def: null, cur: null, added: [],
   copy: false,
+  stats: store.get("lineups:nba:stats") === true, // collapsed (no stats) by default
 };
 
 // ---------- formatting ----------
@@ -15,6 +16,7 @@ const injOut = (p) => p.injury && !/day|dtd|questionable|probable/i.test(p.injur
 const initials = (n) => n.split(" ").map((x) => x[0]).slice(0, 2).join("");
 
 function statGrid(p) {
+  if (!state.stats) return "";
   const s = p.stats;
   if (!s) return `<div class="nostats">No stats</div>`;
   const cell = (l, v) => `<div><small>${l}</small><b>${v}</b></div>`;
@@ -81,7 +83,7 @@ new ResizeObserver(() => drawCourt()).observe($("#board"));
 function render() {
   const src = state.payload.source;
   $("#board").innerHTML = `<div class="source">Default depth chart: <a href="${esc(src.url)}" target="_blank" rel="noopener">${esc(src.name)}</a> · stats from ESPN · drag a tile to reorder, move or bench a player. Players can hold several positions.</div>
-    <div class="court-wrap"><div class="court" id="court"><svg class="court-art" id="courtArt" aria-hidden="true"></svg>
+    <div class="court-wrap"><div class="court${state.stats ? "" : " collapsed"}" id="court"><svg class="court-art" id="courtArt" aria-hidden="true"></svg>
       ${spotHtml("PF", 4)}${spotHtml("C", 5)}${spotHtml("SG", 2)}${spotHtml("SF", 3)}${spotHtml("PG", 1)}
     </div></div>`;
   drawCourt();
@@ -141,6 +143,18 @@ $("#bench").addEventListener("click", (e) => {
   for (const p of POS) state.cur[p] = state.cur[p].filter((id) => id !== pid);
   persist();
   render();
+});
+
+function syncStatsBtn() {
+  $("#statsBtn").setAttribute("aria-pressed", state.stats);
+  $("#statsBtn").textContent = `Stats: ${state.stats ? "on" : "off"}`;
+}
+syncStatsBtn();
+$("#statsBtn").addEventListener("click", () => {
+  state.stats = !state.stats;
+  store.set("lineups:nba:stats", state.stats);
+  syncStatsBtn();
+  if (state.payload) render();
 });
 
 $("#copyBtn").addEventListener("click", () => {

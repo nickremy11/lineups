@@ -40,7 +40,7 @@
 .starter .statgrid b { font-size: 13px; }
 .nostats { color: var(--muted); font-size: 11px; margin-top: 4px; }
 .bench .tile { margin-bottom: 6px; }
-#copyBtn[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 30%, var(--panel-2)); border-color: var(--accent); }
+#copyBtn[aria-pressed="true"], #statsBtn[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 30%, var(--panel-2)); border-color: var(--accent); }
 
 @container (max-width: 760px) {
   .court { grid-template-columns: 1fr; row-gap: 14px; }
@@ -49,3 +49,10 @@
   .spot[data-pos="PF"] { order: 4; } .spot[data-pos="C"] { order: 5; }
   .court-art { display: none; }
 }
+
+/* collapsed view: name, number, positions only */
+.collapsed .starter .tile .face { width: 44px; height: 44px; }
+.collapsed .starter .tile { align-items: center; }
+.collapsed .backups .tile { padding: 6px 9px; }
+.collapsed .backups .body { padding: 0; }
+.collapsed .spot { }
