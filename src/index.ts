@@ -1,3 +1,4 @@
+import { LEAGUES, getLeagueTeams, getSoccerFoot, getSoccerPlayer, getSoccerTeam, searchSoccerPlayers } from "./sports/soccer";
 import { getNflPlayer, getNflTeam, listNflTeams, searchNflPlayers } from "./sports/nfl";
 import { getNbaPlayer, getNbaTeam, listNbaTeams, searchNbaPlayers } from "./sports/nba";
 import { getPlayer, getTeam, listTeams, searchPlayers } from "./sports/nhl";
@@ -62,6 +63,26 @@ export default {
         }
         if (parts[2] === "player" && parts[3]) {
           const p = await getNflPlayer(parts[3]);
+          return p ? json(p, 200, 300) : json({ error: "Player not found" }, 404);
+        }
+      }
+      if (parts[1] === "soccer") {
+        if (parts[2] === "leagues" && !parts[3]) return json(LEAGUES, 200, 3600);
+        if (parts[2] === "leagues" && parts[3] && parts[4] === "teams") {
+          const teams = await getLeagueTeams(Number(parts[3]));
+          return teams ? json(teams, 200, 3600) : json({ error: "Unknown league" }, 404);
+        }
+        if (parts[2] === "teams" && parts[3] && /^\d+$/.test(parts[3])) return json(await getSoccerTeam(Number(parts[3])), 200, 120);
+        if (parts[2] === "search") {
+          const q = url.searchParams.get("q")?.trim() ?? "";
+          return q.length < 2 ? json([]) : json(await searchSoccerPlayers(q), 200, 300);
+        }
+        if (parts[2] === "foot" && parts[3]) {
+          const f = await getSoccerFoot(parts[3]);
+          return f ? json(f, 200, 86400) : json({ error: "Bad id" }, 400);
+        }
+        if (parts[2] === "player" && parts[3]) {
+          const p = await getSoccerPlayer(parts[3]);
           return p ? json(p, 200, 300) : json({ error: "Player not found" }, 404);
         }
       }

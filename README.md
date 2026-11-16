@@ -12,11 +12,13 @@ public/                 static assets (served by Workers Assets)
   nhl/                  NHL page (index.html, app.js, nhl.css)   -> /nhl/
   nba/                  NBA half-court page                      -> /nba/
   nfl/                  NFL football-field page                  -> /nfl/
+  soccer/               Soccer pitch page                        -> /soccer/
 src/
   index.ts              router: /api/<sport>/... ; everything else -> assets
   sports/nhl.ts         NHL data adapter (NHL API + DailyFaceoff + PuckPedia)
   sports/nba.ts         NBA data adapter (ESPN depth chart, roster, season averages)
   sports/nfl.ts         NFL data adapter (Ourlads depth chart + ESPN roster)
+  sports/soccer.ts      Soccer data adapter (FotMob squads, last-match XI, ratings, preferred foot)
   sports/nhl-teams.ts   team list (abbrev, DailyFaceoff slug, division)
   sports/types.ts       shared Player / Lineup types
 ```
@@ -44,6 +46,12 @@ RealGM is behind a Cloudflare challenge, so it isn't used.
 Ourlads depth chart page (server-rendered HTML tables: offense, defense, special teams, practice squad, reserves; formation varies by
 team, e.g. 3-4 vs 4-3) for the lines; ESPN roster API for headshots, injuries and practice-squad/IR flags (matched by name, then jersey).
 Tiles can be switched between light / medium / dark in the header.
+
+## Soccer data sources
+FotMob (server-rendered `__NEXT_DATA__`): league pages for team lists (15 European leagues), team squad page for positions
+(e.g. `CB,RB`), season rating, injuries and shirt numbers, the last match page for formation + the starting XI in slot order,
+and the player page for preferred foot (loaded lazily, cached 30 days, and remembered in the browser).
+Formations are generated from the formation string (any `x-y-z`), backups under each slot are auto-picked by positional fit then rating.
 
 ## Dev / deploy
 ```
