@@ -61,18 +61,18 @@ function drawCourt() {
   const w = court.clientWidth;
   const s = w / 50; // px per foot (court is 50ft wide)
   const h = court.clientHeight;
-  const cx = w / 2, rim = 5.25 * s, ln = "#2f4268";
+  const cx = w / 2, rim = 5.25 * s, ln = "#fffaf0";
   const corner = 5.25 + Math.sqrt(23.75 ** 2 - 22 ** 2);
   const svg = $("#courtArt");
   svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
   svg.innerHTML = `
     <g fill="none" stroke="${ln}" stroke-width="2">
-      <rect x="${cx - 8 * s}" y="0" width="${16 * s}" height="${19 * s}" fill="#4aa3ff0a"/>
+      <rect x="${cx - 8 * s}" y="0" width="${16 * s}" height="${19 * s}" fill="#b5482f" fill-opacity=".38"/>
       <path d="M ${cx - 6 * s} ${19 * s} A ${6 * s} ${6 * s} 0 0 0 ${cx + 6 * s} ${19 * s}"/>
       <path d="M ${cx - 6 * s} ${19 * s} A ${6 * s} ${6 * s} 0 0 1 ${cx + 6 * s} ${19 * s}" stroke-dasharray="6 6"/>
       <path d="M ${cx - 4 * s} ${rim} A ${4 * s} ${4 * s} 0 0 0 ${cx + 4 * s} ${rim}"/>
       <line x1="${cx - 3 * s}" y1="${4 * s}" x2="${cx + 3 * s}" y2="${4 * s}" stroke-width="3"/>
-      <circle cx="${cx}" cy="${rim}" r="${0.75 * s}" stroke="#ff8a3d"/>
+      <circle cx="${cx}" cy="${rim}" r="${0.75 * s}" stroke="#e8590c" stroke-width="3"/>
       <path d="M ${3 * s} 0 V ${corner * s} A ${23.75 * s} ${23.75 * s} 0 0 0 ${w - 3 * s} ${corner * s} V 0"/>
       ${[7, 8, 11, 14].map((y) => `<line x1="${cx - 8 * s}" y1="${y * s}" x2="${cx - 9 * s}" y2="${y * s}"/><line x1="${cx + 8 * s}" y1="${y * s}" x2="${cx + 9 * s}" y2="${y * s}"/>`).join("")}
     </g>`;
