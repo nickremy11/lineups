@@ -21,7 +21,7 @@
 .slot.starter.empty { min-height: 92px; }
 .slot.add { min-height: 34px; border-color: #1f2a44; }
 
-.tile { align-items: flex-start; background: #1b2540ee; }
+.tile { align-items: flex-start; }
 .tile .name { font-size: 13.5px; }
 .starter .tile { padding: 10px 12px; gap: 12px; border-color: #3a4a74; }
 .starter .tile .face { width: 54px; height: 54px; }
@@ -67,24 +67,52 @@
     linear-gradient(180deg, rgba(255, 255, 255, .16), rgba(80, 40, 0, .08)),
     repeating-linear-gradient(90deg, #dcae6c 0 70px, #e5b97b 70px 140px, #d6a463 140px 210px, #e0b273 210px 280px, #d9aa68 280px 350px);
 }
-.court .spot-head { color: #4b3820; }
-.court .spot-head i { background: #2b2118; color: #fff; }
-.court .tile { background: #fffaf0f2; border-color: #d8c196; box-shadow: 0 1px 3px #5a3a1055; }
-.court .tile:hover { border-color: #b5482f; }
-.court .starter .tile { border-color: #a9793c; box-shadow: 0 3px 10px #5a3a1066; }
-.court .tile.changed { box-shadow: inset 3px 0 0 #b5482f, 0 1px 3px #5a3a1055; }
-.court .tile.off { border-color: #d98a00; }
-.court .tile .face { background: #eadbbb; color: #7a6544; }
-.court .tile .num { color: #7a6544; }
-.court .chip { background: #2b2118; color: #fff; }
-.court .chip.alt, .court .chip.pos-alt { background: transparent; border: 1px solid #b89c6c; color: #6e5a40; }
-.court .chip.inj { background: #fbdcd8; color: #a1231a; }
-.court .chip.gtd { background: #fdecc4; color: #8a5600; }
-.court .chip.new { background: #d4f0e1; color: #14663f; }
-.court .statgrid div { background: #7a54281a; }
-.court .statgrid small { color: #8a7350; }
-.court .nostats { color: #8a7350; }
-.court .slot .ph { color: #8a6f43; }
-.court .slot.empty { border-color: #a9854f; }
-.court .slot.add { border-color: #b8975f88; }
-.court .over { background: #ffffff66; border-color: #b5482f !important; }
+.spot-head { color: #4b3820; }
+.spot-head i { background: #2b2118; color: #fff; }
+.tile { background: #fffaf0f2; border-color: #d8c196; box-shadow: 0 1px 3px #5a3a1055; }
+.tile:hover { border-color: #b5482f; }
+.starter .tile { border-color: #a9793c; box-shadow: 0 3px 10px #5a3a1066; }
+.tile.changed { box-shadow: inset 3px 0 0 #b5482f, 0 1px 3px #5a3a1055; }
+.tile.off { border-color: #d98a00; }
+.tile .face { background: #eadbbb; color: #7a6544; }
+.tile .num { color: #7a6544; }
+.chip { background: #2b2118; color: #fff; }
+.chip.alt, .chip.pos-alt { background: transparent; border: 1px solid #b89c6c; color: #6e5a40; }
+.chip.inj { background: #fbdcd8; color: #a1231a; }
+.chip.gtd { background: #fdecc4; color: #8a5600; }
+.chip.new { background: #d4f0e1; color: #14663f; }
+.statgrid div { background: #7a54281a; }
+.statgrid small { color: #8a7350; }
+.nostats { color: #8a7350; }
+.slot .ph { color: #8a6f43; }
+.slot.empty { border-color: #a9854f; }
+.slot.add { border-color: #b8975f88; }
+.over { background: #ffffff66; border-color: #b5482f !important; }
+
+/* ---- light page theme (NBA only; shared styles read these variables) ---- */
+:root {
+  --bg: #f3e8d3; --panel: #fbf4e6; --panel-2: #efe2c7; --tile: #fffaf0; --line: #d8c196;
+  --text: #231a10; --muted: #6e5a40; --accent: #b5482f;
+  color-scheme: light;
+}
+body { background: linear-gradient(180deg, #f6ecd8, #efe0c2) fixed; }
+.topbar { box-shadow: 0 1px 0 #d8c196, 0 4px 14px #7a542815; }
+.brand span { color: var(--accent); }
+.sports a.on { background: #efe2c7; }
+.btn { background: #fffaf0; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.banner { background: #fdecc4; border-color: #e2bd6a; color: #6b4a00; }
+.source a { color: #9a3a22; }
+.changes { color: #b5482f; }
+.bench { box-shadow: 0 2px 10px #7a542822; }
+.bench h5 { color: #8a7350; }
+.bench .empty { color: #8a7350; }
+.popover, .modal-card { box-shadow: 0 18px 50px #5a3a1055; }
+.popover input, .modal input, .modal select { background: #fffaf0; }
+.chip.hand { background: #efe2c7; color: #6e5a40; }
+.team-grid button:hover { background: #efe2c7; }
+.results button { background: #fffaf0; }
+.tile .x { background: #00000014; }
+.tile.ghost { box-shadow: 0 14px 34px #5a3a1088; }
+#copyBtn[aria-pressed="true"], #statsBtn[aria-pressed="true"] { background: #f0c9bd; color: #5a1f10; }
