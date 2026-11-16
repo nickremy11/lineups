@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lineups · Bruised Banana</title>
+<link rel="stylesheet" href="/shared/base.css">
+<style>
+  main { max-width: 760px; margin: 0 auto; padding: 56px 20px; }
+  h1 { font-size: 34px; margin: 0 0 8px; letter-spacing: -.5px; }
+  p.lead { color: var(--muted); margin: 0 0 32px; font-size: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+  .card { display: block; text-decoration: none; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+  a.card:hover { border-color: var(--accent); }
+  .card b { font-size: 18px; display: block; }
+  .card small { color: var(--muted); }
+  .card.soon { opacity: .45; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Lineups</h1>
+  <p class="lead">Depth charts you can rearrange. Start from the current lines, then see what happens when the injured come back or a new player arrives.</p>
+  <div class="grid">
+    <a class="card" href="/nhl/"><b>NHL</b><small>Lines, pairings, goalies, PP &amp; PK</small></a>
+    <div class="card soon"><b>NBA</b><small>Coming soon</small></div>
+    <div class="card soon"><b>NFL</b><small>Coming soon</small></div>
+    <div class="card soon"><b>European Soccer</b><small>Coming soon</small></div>
+    <div class="card soon"><b>NCAAB</b><small>Coming soon</small></div>
+  </div>
+</main>
+</body>
+</html>

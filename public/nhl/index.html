@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NHL Depth Charts · Lineups</title>
+<link rel="stylesheet" href="/shared/base.css">
+<link rel="stylesheet" href="/nhl/nhl.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/">Line<span>ups</span></a>
+  <nav class="sports">
+    <a class="on" href="/nhl/">NHL</a><span>NBA</span><span>NFL</span><span>Soccer</span><span>NCAAB</span>
+  </nav>
+  <button class="btn team-btn" id="teamBtn" aria-haspopup="true">Loading…</button>
+  <div class="spacer"></div>
+  <span class="changes" id="changes"></span>
+  <button class="btn" id="addBtn">+ Add player</button>
+  <button class="btn" id="resetBtn" disabled>Reset to default</button>
+</header>
+
+<div class="popover" id="teamPop" hidden>
+  <input type="search" id="teamSearch" placeholder="Search teams…" autocomplete="off">
+  <div id="teamList"></div>
+</div>
+
+<div id="banner" class="banner" hidden></div>
+
+<main class="layout">
+  <section class="board" id="board" aria-live="polite"></section>
+  <aside class="bench" id="bench"></aside>
+</main>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <b>Add player</b>
+      <button class="btn" id="modalClose" aria-label="Close">✕</button>
+    </div>
+    <div class="tabs">
+      <button class="tab on" data-tab="search">Search NHL</button>
+      <button class="tab" data-tab="custom">Custom player</button>
+    </div>
+    <div id="tabSearch">
+      <input type="search" id="playerSearch" placeholder="Search any NHL player…" autocomplete="off">
+      <div id="searchResults" class="results"></div>
+    </div>
+    <form id="tabCustom" hidden>
+      <div class="form-grid">
+        <label>Name<input name="name" required></label>
+        <label>Number<input name="number" type="number" min="0" max="99"></label>
+        <label>Position
+          <select name="pos"><option>C</option><option>LW</option><option>RW</option><option>LD</option><option>RD</option><option>G</option></select>
+        </label>
+        <label>Also plays
+          <input name="alt" placeholder="e.g. LW, RW">
+        </label>
+        <label>Shoots<select name="shoots"><option value="L">Left</option><option value="R">Right</option></select></label>
+        <label>Avg TOI (mm:ss)<input name="toi" placeholder="18:30"></label>
+        <label>Goals<input name="g" type="number" min="0"></label>
+        <label>Assists<input name="a" type="number" min="0"></label>
+        <label>+/-<input name="pm" type="number"></label>
+      </div>
+      <button class="btn primary" type="submit">Add to bench</button>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+<script type="module" src="/nhl/app.js"></script>
+</body>
+</html>
