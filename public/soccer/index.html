@@ -16,14 +16,15 @@
   </nav>
   <button class="btn team-btn" id="teamBtn" aria-haspopup="true">Choose a team…</button>
   <label class="fsel">Formation <select id="formationSel"></select></label>
+  <label class="fsel">Backups <select id="backupSel"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label>
   <div class="spacer"></div>
   <span class="changes" id="changes"></span>
   <div class="seg" id="tileSeg" role="group" aria-label="Tile style">
     <span>Tiles</span><button data-tiles="light">Light</button><button data-tiles="medium">Medium</button><button data-tiles="dark">Dark</button>
   </div>
-  <button class="btn" id="copyBtn" aria-pressed="false" title="When on, dragging a player to another slot adds them (copy) instead of moving them. Holding Alt/Option does the same.">Copy mode: off</button>
+  <button class="btn" id="copyBtn" aria-pressed="false" title="Copy mode: when on, dragging a player to another slot adds them (copy) instead of moving them. Holding Alt/Option does the same.">Copy: off</button>
   <button class="btn" id="addBtn">+ Add player</button>
-  <button class="btn" id="resetBtn" disabled>Reset to default</button>
+  <button class="btn" id="resetBtn" disabled>Reset</button>
 </header>
 
 <div class="popover" id="teamPop" hidden>

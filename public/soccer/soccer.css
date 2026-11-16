@@ -38,18 +38,19 @@ body[data-tiles="dark"]   { --t-bg: #17212b; --t-bd: #2c3b49; --t-tx: #f2f7fb; -
 
 /* ---- pitch ---- */
 .pitch-wrap { container-type: inline-size; }
-.pitch { position: relative; border: 4px solid #f4f7f1; border-radius: 10px; padding: 18px 16px 18px; overflow: hidden;
+.pitch { position: relative; border: 4px solid #f4f7f1; border-radius: 10px; padding: 12px 14px 12px; overflow: hidden;
   background: repeating-linear-gradient(0deg, #3a8f4a 0 90px, #348643 90px 180px); box-shadow: 0 3px 14px #1f5a2a44; }
 .pitch-art { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-.line { position: relative; display: grid; gap: 8px; margin: 0 auto 16px; align-items: start; }
+.line { position: relative; display: grid; gap: 8px; margin: 0 auto 10px; align-items: start; }
 .line:last-child { margin-bottom: 0; }
 .spot { min-width: 0; }
-.spot-head { text-align: center; font-weight: 800; font-size: 10.5px; letter-spacing: .1em; color: #fff; text-shadow: 0 1px 2px #0a3a1a99; margin-bottom: 3px; }
-.slot { border: 1.5px dashed transparent; border-radius: 9px; display: flex; margin-bottom: 3px; }
+.spot-head { text-align: center; font-weight: 800; font-size: 9.5px; letter-spacing: .1em; color: #fff; text-shadow: 0 1px 2px #0a3a1a99; margin-bottom: 2px; line-height: 1.1; }
+.slot { border: 1.5px dashed transparent; border-radius: 9px; display: flex; margin-bottom: 2px; }
 .slot > .tile { flex: 1; min-width: 0; }
 .slot.empty { border-color: #ffffff88; min-height: 30px; }
-.slot.starter.empty { min-height: 92px; }
-.slot.add { min-height: 22px; border-color: #ffffff44; }
+.slot.starter.empty { min-height: 52px; }
+.slot.add { min-height: 14px; border-color: #ffffff44; }
+.slot.add .ph { font-size: 9px; line-height: 1; }
 .slot .ph { margin: auto; color: #ffffffb0; font-size: 10px; font-weight: 700; letter-spacing: .06em; }
 .over { border-color: #fff !important; background: #ffffff44; }
 
@@ -73,11 +74,12 @@ body[data-tiles="dark"]   { --t-bg: #17212b; --t-bd: #2c3b49; --t-tx: #f2f7fb; -
 .score.s4 { background: #12994a; } .score.s3 { background: #55b848; } .score.s2 { background: #c9a41c; } .score.s1 { background: #e0802c; } .score.s0 { background: #d4463c; }
 .tile .x { position: absolute; top: 2px; right: 3px; width: 17px; height: 17px; line-height: 15px; text-align: center; border-radius: 50%; border: 0; background: #0003; color: #fff; font-size: 10px; padding: 0; }
 
-.starter .tile { padding: 7px 5px 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; }
-.starter .tile .face { width: 46px; height: 46px; font-size: 13px; }
-.starter .tile .nmrow { width: 100%; display: flex; gap: 4px; justify-content: center; align-items: baseline; font-size: 12.5px; min-width: 0; }
-.starter .tile .meta { display: flex; gap: 3px; flex-wrap: wrap; justify-content: center; align-items: center; }
-.backup .tile { padding: 4px 7px; display: flex; align-items: center; gap: 6px; font-size: 11.5px; }
+.starter .tile { padding: 5px 7px; display: flex; flex-direction: row; align-items: center; gap: 7px; text-align: left; }
+.starter .tile .face { width: 36px; height: 36px; font-size: 12px; }
+.starter .tile .info { min-width: 0; flex: 1; }
+.starter .tile .nmrow { display: flex; gap: 4px; align-items: baseline; font-size: 12.5px; min-width: 0; }
+.starter .tile .meta { display: flex; gap: 3px; flex-wrap: nowrap; align-items: center; margin-top: 2px; overflow: hidden; }
+.backup .tile { padding: 2px 7px; display: flex; align-items: center; gap: 6px; font-size: 11px; }
 .backup .tile .face { display: none; }
 .backup .tile .nmrow { display: flex; gap: 5px; align-items: baseline; min-width: 0; flex: 1; }
 .backup .tile .meta { display: flex; gap: 3px; align-items: center; flex: none; }
@@ -90,4 +92,13 @@ body[data-tiles="dark"]   { --t-bg: #17212b; --t-bd: #2c3b49; --t-tx: #f2f7fb; -
 .bench .tile .meta { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 2px; align-items: center; }
 
 @media (max-width: 1000px) { .layout { grid-template-columns: 1fr; } .popover { left: 10px; } .bench { position: static; max-height: none; } }
-@container (max-width: 560px) { .backup .tile .meta .chip { display: none; } .starter .tile .face { width: 36px; height: 36px; } }
+@container (max-width: 640px) { .backup .tile .meta .chip { display: none; } .starter .tile .face { display: none; } }
+
+/* compact header so the whole pitch fits on one screen */
+.topbar { gap: 8px; padding: 7px 14px; }
+.topbar .btn { padding: 6px 10px; }
+.seg span { display: none; }
+.seg button { padding: 6px 9px; }
+.fsel select { padding: 6px 6px; }
+.layout { padding-top: 10px; }
+.source { margin-bottom: 6px; }

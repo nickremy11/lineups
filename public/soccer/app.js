@@ -7,6 +7,7 @@ const state = {
   leagues: [], leagueId: 47, teamsByLeague: {}, team: null, payload: null,
   players: new Map(), formation: "4-3-3", slots: [], def: null, added: [], copy: false,
   foot: store.get("lineups:soccer:foot") || {},
+  backups: Number(store.get("lineups:soccer:backups") ?? 2), // backups shown under each starter (the rest stay in the data)
 };
 
 // ---------- formations -> roles ----------
@@ -115,8 +116,8 @@ function tileHtml(p, slotId, kind) {
       <div class="meta">${posChips(p)}${footChip(p)}${injChip(p)}${scoreChip(p)}${p.added ? `<span class="chip new">NEW</span>` : ""}</div></div>
       ${p.added ? `<button class="x" data-action="remove" title="Remove player">✕</button>` : ""}</div>`;
   }
-  return `<div class="${cls}" ${attrs}><div class="face">${face(p)}</div><div class="nmrow">${num}<span class="nm">${esc(p.name)}</span></div>
-    <div class="meta">${posChips(p)}${footChip(p)}${injChip(p)}${scoreChip(p)}${p.added ? `<span class="chip new">NEW</span>` : ""}</div></div>`;
+  return `<div class="${cls}" ${attrs}><div class="face">${face(p)}</div><div class="info"><div class="nmrow">${num}<span class="nm">${esc(p.name)}</span></div>
+    <div class="meta">${posChips(p, 2)}${footChip(p)}${injChip(p)}${scoreChip(p)}${p.added ? `<span class="chip new">NEW</span>` : ""}</div></div></div>`;
 }
 
 function spotHtml(s, role) {
@@ -125,8 +126,10 @@ function spotHtml(s, role) {
   const starter = list.length
     ? `<div class="slot starter" data-slot="${s}.0">${t(0)}</div>`
     : `<div class="slot starter empty" data-slot="${s}.0"><span class="ph">OPEN</span></div>`;
-  const backups = list.slice(1).map((_, i) => `<div class="slot backup" data-slot="${s}.${i + 1}">${t(i + 1)}</div>`).join("");
-  const add = list.length ? `<div class="slot add empty" data-slot="${s}.${list.length}"><span class="ph">+</span></div>` : "";
+  const shown = Math.min(list.length, 1 + state.backups);
+  const backups = list.slice(1, shown).map((_, i) => `<div class="slot backup" data-slot="${s}.${i + 1}">${t(i + 1)}</div>`).join("");
+  const hidden = list.length - shown;
+  const add = list.length ? `<div class="slot add empty" data-slot="${s}.${shown}" title="${hidden > 0 ? hidden + " more backup" + (hidden > 1 ? "s" : "") + " hidden — change “Backups” in the header" : "Drop a player here to add a backup"}"><span class="ph">${hidden > 0 ? "+" + hidden : "+"}</span></div>` : "";
   return `<div class="spot"><div class="spot-head">${role}</div>${starter}${backups}${add}</div>`;
 }
 
@@ -247,7 +250,7 @@ $("#bench").addEventListener("click", (e) => {
 $("#copyBtn").addEventListener("click", () => {
   state.copy = !state.copy;
   $("#copyBtn").setAttribute("aria-pressed", state.copy);
-  $("#copyBtn").textContent = `Copy mode: ${state.copy ? "on" : "off"}`;
+  $("#copyBtn").textContent = `Copy: ${state.copy ? "on" : "off"}`;
   if (state.copy) toast("Copy mode: dragging a player to another slot adds them there too.");
 });
 
@@ -265,6 +268,10 @@ $("#formationSel").addEventListener("change", (e) => {
   persist();
   render();
 });
+
+// ---------- backups shown ----------
+$("#backupSel").value = String(state.backups);
+$("#backupSel").addEventListener("change", (e) => { state.backups = +e.target.value; store.set("lineups:soccer:backups", state.backups); if (state.payload) render(); });
 
 // ---------- tile style ----------
 function setTiles(t) {
